@@ -20,3 +20,48 @@ springdoc:
     urls[2]:
       name: Inventory Service
       url: /aggregate/inventory-service/v3/api-docs
+
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+    instances:
+        ratingHotelBreaker:
+          sliding-window-type: COUNT_BASED
+          sliding-window-size: 10
+          failure-rate-threshold: 50
+          wait-duration-in-open-state:
+            seconds: 5
+          permitted-number-of-calls-in-half-open-state: 3
+          automatic-transition-from-open-to-half-open-enabled: true
+          minimum-number-of-calls: 5
+
+  timelimiter:
+    configs:
+      default:
+        timeout-duration:
+          seconds: 3
+
+  retry:
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration:
+          seconds: 2
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
